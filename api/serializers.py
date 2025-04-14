@@ -28,7 +28,9 @@ class AuthUserLoginSerializer(serializers.Serializer):
     password = serializers.CharField(max_length=128, write_only=True)
     access = serializers.CharField(read_only=True)
     refresh = serializers.CharField(read_only=True)
-    role = serializers.CharField(read_only=True)
+
+    roles = serializers.ListField(child=serializers.CharField(), read_only=True)
+    full_name = serializers.CharField(read_only=True)
 
     def create(self, validated_date):
         pass
@@ -56,7 +58,8 @@ class AuthUserLoginSerializer(serializers.Serializer):
                 'refresh': refresh_token,
                 'email': user.email,
                 'full_name': user.get_full_name(),
-                'role': user.get_role_display(),
+                'roles': [role.name for role in user.roles.all()],
+
             }
 
             return validation

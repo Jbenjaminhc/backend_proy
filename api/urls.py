@@ -6,7 +6,7 @@ from .views import (
     AuthUserLoginView,
     LogoutView,
     AllAccessView,
-    ClientePremiumView,
+    PremiumView,
     ClienteView,
     AdminView
 )
@@ -18,7 +18,7 @@ urlpatterns = [
     #path('login', AuthUserLoginView.as_view(), name='login'),
     #path('users', UserListView.as_view(), name='users')
     path('test/all', AllAccessView.as_view(), name='test_all'),
-    path('test/premium', ClientePremiumView.as_view(), name='test_premium'),
+    path('test/premium', PremiumView.as_view(), name='test_premium'),
     path('test/cliente', ClienteView.as_view(), name='test_cliente'),
     path('test/admin', AdminView.as_view(), name='test_admin'),
     path('signin', AuthUserLoginView.as_view(), name='signin'),

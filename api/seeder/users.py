@@ -1,5 +1,5 @@
 import random
-from api.models import User
+from api.models import User,Role
 
 def generate_random_name():
     first_names = ['Pedro', 'Juan', 'Carlos', 'Ana', 'Maria', 'Sofia', 'Luis', 'Gabriel', 'Lucia', 'Marta']
@@ -10,22 +10,38 @@ def generate_random_name():
     return first_name, last_name
 
 def seed_users():
-    roles = {
-        User.ADMIN: 'admin@admin.com',
-        User.CLIENTE_PREMIUM: 'premium@premium.com',
-        User.CLIENTE: 'cliente@cliente.com'
-    }
+    admin_role, _ = Role.objects.get_or_create(name='Admin')
+    premium_role, _ = Role.objects.get_or_create(name='Premium')
+    cliente_role, _ = Role.objects.get_or_create(name='Cliente')
 
-    for role, email in roles.items():
+    
+    users_data = [
+        {
+            'email': 'admin@admin.com',
+            'roles': [admin_role, premium_role, cliente_role]
+        },
+        {
+            'email': 'premium@premium.com',
+            'roles': [premium_role, cliente_role]
+        },
+        {
+            'email': 'cliente@cliente.com',
+            'roles': [cliente_role]
+        }
+    ]
+
+    for data in users_data:
+        email = data['email']
         if not User.objects.filter(email=email).exists():
             first_name, last_name = generate_random_name()
-            User.objects.create_user(
+            user = User.objects.create_user(
                 email=email,
                 password='password',
                 first_name=first_name,
                 last_name=last_name,
-                role=role,
                 created_by=email,
-                modified_by=email,
+                modified_by=email
             )
+            user.roles.set(data['roles'])
+            user.save()
 

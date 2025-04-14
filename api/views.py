@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .permissions import IsAdmin, IsClientePremium, IsCliente
+from .permissions import IsAdmin, IsPremium, IsCliente
 
 from .serializers import (
     AuthUserRegistrationSerializer,
@@ -40,9 +40,18 @@ class AuthUserLoginView(APIView):
     serializer_class = AuthUserLoginSerializer
 
     def post(self, request):
-        ##print("LoginView ejecutado - Se recibió una solicitud de login del usuario:", request.data)
+
+        #email = request.data.get('email')
+        #password = request.data.get('password')
+
+        ##print("📩 Email recibido:", email)
+        ##print("🔐 Password recibido:", password) 
+        
+        print("LoginView ejecutado - Se recibió una solicitud de login del usuario:", request.data)
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
+
+
 
         return Response({
             'success': True,
@@ -63,23 +72,23 @@ class AllAccessView(APIView):
     def get(self, request):
         return Response("Contenido público - TODOS pueden acceder.")
 
-class ClientePremiumView(APIView):
-    permission_classes = [IsAuthenticated]
-    #permission_classes = [IsAuthenticated, IsClientePremium]
+class PremiumView(APIView):
+    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsPremium]
 
     def get(self, request):
         return Response("Contenido exclusivo para CLIENTE PREMIUM.")
 
 class ClienteView(APIView):
-    permission_classes = [IsAuthenticated]
-    #permission_classes = [IsAuthenticated, IsCliente]
+    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsCliente]
 
     def get(self, request):
         return Response("Contenido exclusivo para CLIENTE.")
 
 class AdminView(APIView):
-    permission_classes = [IsAuthenticated]
-    #permission_classes = [IsAuthenticated, IsAdmin]
+    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsAdmin]
 
     def get(self, request):
         return Response("Contenido exclusivo para ADMIN.")

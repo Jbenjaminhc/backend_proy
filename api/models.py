@@ -7,19 +7,14 @@ from django.utils import timezone
 
 from .managers import CustomUserManager
 
+class Role(models.Model):
+    name = models.CharField(max_length=30, unique=True)
+
+    def __str__(self):
+        return self.name
+
 # Create your models here.
 class User(AbstractBaseUser, PermissionsMixin):
-
-    # These fields tie to the roles!
-    ADMIN = 1
-    PREMIUM = 2
-    CLIENTE = 3
-
-    ROLE_CHOICES = (
-        (ADMIN, 'Admin'),
-        (PREMIUM, 'Premium'),
-        (CLIENTE, 'Cliente')
-    )
 
     class Meta:
         verbose_name = 'user'
@@ -29,7 +24,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=50, blank=True)
-    role = models.PositiveSmallIntegerField(choices=ROLE_CHOICES, blank=True, null=True, default=7)
+    roles = models.ManyToManyField( Role, related_name='users')
     date_joined = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     is_deleted = models.BooleanField(default=False)
@@ -48,4 +43,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}".strip()
+    
+    def has_role(self, role_name):
+        return self.roles.filter(name=role_name).exists()
 
