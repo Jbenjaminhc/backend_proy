@@ -40,12 +40,6 @@ class AuthUserLoginView(APIView):
     serializer_class = AuthUserLoginSerializer
 
     def post(self, request):
-
-        #email = request.data.get('email')
-        #password = request.data.get('password')
-
-        ##print("📩 Email recibido:", email)
-        ##print("🔐 Password recibido:", password) 
         
         print("LoginView ejecutado - Se recibió una solicitud de login del usuario:", request.data)
         serializer = self.serializer_class(data=request.data)

@@ -4,8 +4,8 @@ from django.contrib.auth.models import update_last_login
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import User
-
+from .models import User, Role
+'''
 class AuthUserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -22,6 +22,47 @@ class AuthUserRegistrationSerializer(serializers.ModelSerializer):
         validated_data['last_name'] = 'Mamani Choque'
         auth_user = User.objects.create_user(**validated_data)
         return auth_user
+'''
+
+class AuthUserRegistrationSerializer(serializers.ModelSerializer):
+    roles = serializers.SlugRelatedField(
+        many=True,
+        slug_field='name',
+        queryset=Role.objects.all(),
+        required=False
+    )
+
+    class Meta:
+        model = User
+        fields = (
+            'email',
+            'password',
+            'first_name',
+            'last_name',
+            'roles', 
+        )
+        extra_kwargs = {
+            'password': {'write_only': True}
+        }
+
+    def create(self, validated_data):
+        roles_data = validated_data.pop('roles', None)
+        email = validated_data.get('email')
+
+        validated_data['created_by'] = email
+        validated_data['modified_by'] = email
+
+        user = User.objects.create_user(**validated_data)
+
+        if roles_data:
+            user.roles.set(roles_data)
+        else:
+            
+            cliente_role, _ = Role.objects.get_or_create(name="Cliente")
+            user.roles.add(cliente_role)
+
+        return user
+
 
 class AuthUserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
