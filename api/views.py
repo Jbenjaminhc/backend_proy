@@ -4,13 +4,15 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from .permissions import IsAdmin, IsPremium, IsCliente
+from rest_framework.viewsets import ModelViewSet
 
 from .serializers import (
     AuthUserRegistrationSerializer,
     AuthUserLoginSerializer,
+    UserSerializer
 )
 
-from .models import User
+from .models import User,Role
 
 
 class AuthUserRegistrationView(APIView):
@@ -54,7 +56,7 @@ class AuthUserLoginView(APIView):
         }, status=status.HTTP_200_OK)
 
 class LogoutView(APIView):
-    permission_classes = [IsAuthenticated]  
+    #permission_classes = [IsAuthenticated]  
 
     def post(self, request):
         #print("LogoutView ejecutado - Se recibió una solicitud de logout del usuario:", request.user.email)
@@ -86,3 +88,24 @@ class AdminView(APIView):
 
     def get(self, request):
         return Response("Contenido exclusivo para ADMIN.")
+    
+class UserViewSet(ModelViewSet):
+    queryset = User.objects.all()
+    #serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'uid'
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return AuthUserRegistrationSerializer
+        return UserSerializer
+
+    def perform_create(self, serializer):
+        current_user = self.request.user.email
+        instance = serializer.save()
+        instance.created_by = current_user
+        instance.modified_by = current_user
+        instance.save()
+
+    def perform_update(self, serializer):
+        serializer.save(modified_by=self.request.user.email)

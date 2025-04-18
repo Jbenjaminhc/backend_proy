@@ -1,4 +1,5 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt import views as jwt_views
 #UserListView
 from .views import (
@@ -8,8 +9,12 @@ from .views import (
     AllAccessView,
     PremiumView,
     ClienteView,
-    AdminView
+    AdminView,
+    UserViewSet
 )
+
+router = DefaultRouter()
+router.register(r'users', UserViewSet, basename='user')
 
 urlpatterns = [
     path('token/obtain/', jwt_views.TokenObtainPairView.as_view(), name='token_create'),
@@ -24,4 +29,5 @@ urlpatterns = [
     path('signin', AuthUserLoginView.as_view(), name='signin'),
     path('signup', AuthUserRegistrationView.as_view(), name='signup'),
     path('signout', LogoutView.as_view(), name='signout'),
+    path('', include(router.urls)),
 ]

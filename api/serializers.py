@@ -63,6 +63,22 @@ class AuthUserRegistrationSerializer(serializers.ModelSerializer):
 
         return user
 
+class UserSerializer(serializers.ModelSerializer):
+    roles = serializers.SlugRelatedField(
+        many=True,
+        slug_field='name',
+        queryset=Role.objects.all()
+    )
+
+    class Meta:
+        model = User
+        fields = (
+            'id', 'uid', 'email', 'first_name', 'last_name',
+            'roles', 'date_joined', 'is_active', 'is_deleted',
+            'created_date', 'modified_date', 'created_by', 'modified_by'
+        )
+        read_only_fields = ('uid', 'date_joined', 'created_date', 'modified_date')
+
 
 class AuthUserLoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
