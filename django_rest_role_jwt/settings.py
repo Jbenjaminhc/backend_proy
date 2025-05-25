@@ -40,8 +40,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'api.apps.ApiConfig'
+    'channels',
+    'api.apps.ApiConfig',
+    
 ]
+
+
+#Buenas practicas Advertencia claves primarias 
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -89,7 +96,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'generador_presentaciones',
         'USER': 'postgres',
-        'PASSWORD': '8960406',
+        'PASSWORD': 'Gb22aC08',
         'HOST': 'localhost',
         'PORT': '5432',
     }
@@ -155,3 +162,21 @@ SIMPLE_JWT = {
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
 }
 
+import os
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+
+
+ASGI_APPLICATION = 'django_rest_role_jwt.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('127.0.0.1', 6379)],
+        },
+    },
+}
